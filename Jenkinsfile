@@ -4,64 +4,38 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from the repository
-                git 'https://github.com/NwannedinmaAnibude/class-15-assignment.git'
+                // Checkout your code from version control
+                // Use the appropriate SCM command for your repository
+                git branch: 'main', url: 'https://github.com/NwannedinmaAnibude/class-15-assignment.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
-                // Change to the directory where your Terraform configuration files are located
-                dir('terraform') {
-                    // Initialize Terraform
-                    sh 'terraform init'
-                }
+                // Run Terraform init to initialize the working directory
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                dir('terraform') {
-                    // Plan the Terraform deployment
-                    sh 'terraform plan -out=tfplan'
-                }
+                // Run Terraform plan to preview changes
+                sh 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                dir('terraform') {
-                    // Apply the Terraform changes to create the S3 bucket
-                    input message: 'Deploy to AWS?', submitter: 'admin'
-                    sh 'terraform apply tfplan'
-                }
-            }
-        }
-
-        stage('Terraform Destroy') {
-            steps {
-                dir('terraform') {
-                    // Optionally, include a stage to destroy the S3 bucket (for cleanup)
-                    // This stage can be triggered manually or automatically based on your requirements.
-                    input message: 'Destroy AWS resources?', submitter: 'admin'
-                    sh 'terraform destroy'
-                }
+                // Run Terraform apply to create the S3 bucket
+                sh 'terraform apply -auto-approve tfplan'
             }
         }
     }
 
     post {
-        success {
-            echo 'Deployment succeeded!'
-        }
-        failure {
-            echo 'Deployment failed!'
-        }
         always {
-            // Clean up any temporary files or resources if needed
-            dir('terraform') {
-                deleteDir()
-            }
+            // Clean up Terraform temporary files
+            sh 'rm -rf .terraform terraform.tfstate* tfplan'
         }
     }
 }
