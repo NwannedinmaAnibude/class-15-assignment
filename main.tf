@@ -10,10 +10,3 @@ resource "aws_s3_bucket" "my_bucket" {
   # Add other bucket configurations if needed
 }
 
-resource "aws_s3_bucket_acl" "my_bucket" {
-  bucket = aws_s3_bucket.my_bucket.bucket
-
-  acl = "private"  # Set the ACL to private or any other desired value
-
-  # Add other ACL configurations if needed
-}
